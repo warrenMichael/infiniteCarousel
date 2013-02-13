@@ -7,6 +7,7 @@ carousel = function(carouselContainer) {
   var previous = $(carousel).find('.previous');
   var next = $(carousel).find('.next');
   var slideAmount = slide.length;
+  var moving = false;
 
   if (previous.length || next.length) {
     var lastSlideClone = carousel.find('.slide-container div:first').clone();
@@ -28,6 +29,10 @@ carousel = function(carouselContainer) {
 
   previous.click(function(e){
     e.preventDefault();
+    if (moving) {
+      return;
+    }
+    moving = true;
     thumbs.removeClass('active');
     var currentSlide = slideContainer.find('.active');
     currentSlideNumber = currentSlide.attr('data-slide');
@@ -50,14 +55,20 @@ carousel = function(carouselContainer) {
     currentPosition = slideContainer.css('left');
     currentPositionNumber = currentPosition.split('px');
     newPosition = (currentPositionNumber[0] - 0) + slideWidth;
-    slideContainer.animate({'left' : newPosition}, 2000);
-    if(currentPosition === (-(slideWidth) + 'px')) {
-      slideContainer.animate({'left' : (-slideWidth * slideAmount)}, 2000);
-    }
+    slideContainer.animate({'left' : newPosition}, 2000, function() {
+        moving = false;
+        if(currentPosition === (-(slideWidth) + 'px')) {
+        slideContainer.css({'left' : (-slideWidth * slideAmount)});
+      }
+    });
   });
 
   next.click(function(e){
     e.preventDefault();
+    if (moving) {
+      return;
+    }
+    moving = true;
     thumbs.removeClass('active');
     var currentSlide = slideContainer.find('.active');
     currentSlideNumber = currentSlide.attr('data-slide');
@@ -77,10 +88,12 @@ carousel = function(carouselContainer) {
     currentPosition = slideContainer.css('left');
     currentPositionNumber = currentPosition.split('px');
     newPosition = (currentPositionNumber[0] - 0) - slideWidth;
-    slideContainer.animate({'left' : newPosition}, 2000);
-    if(currentPosition === (-(slideWidth * slideAmount) + 'px')) {
-      slideContainer.animate({'left' : (-slideWidth)}, 2000);
-    }
+    slideContainer.animate({'left' : newPosition}, 2000, function() {
+      moving = false;
+      if(currentPosition === (-(slideWidth * slideAmount) + 'px')) {
+        slideContainer.css({'left' : (-slideWidth)});
+      }
+    });
   });
 
   thumbs.click(function(e){
